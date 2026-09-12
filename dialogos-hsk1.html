@@ -550,6 +550,7 @@
     if(currentId===id) openDialogue(id);
     else renderList();
   }
+  
 
   document.getElementById("startFirst").addEventListener("click", function(){
     var next = DIALOGUES.find(function(d){ return state.completedIds.indexOf(d.id)===-1; }) || DIALOGUES[0];
@@ -559,7 +560,7 @@
   loadState();
   renderStats();
   renderList();
-  
+
 })();
 </script>
 </body>
