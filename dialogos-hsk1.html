@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dialogos HSK1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  :root{
+    --bg:#EEEDE2;
+    --surface:#FFFFFF;
+    --surface-2:#F7F6EC;
+    --text:#20261F;
+    --text-muted:#666F62;
+    --border:#DBD8C7;
+    --accent:#3D6B5C;
+    --accent-ink:#F4F6F2;
+    --accent-soft:#DEE9E2;
+    --highlight:#B5482F;
+    --highlight-soft:#F3DAD1;
+    --bubble-a:#FFFFFF;
+    --bubble-b:#EFF3EA;
+    --shadow:0 1px 2px rgba(32,38,31,0.06), 0 8px 24px -12px rgba(32,38,31,0.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#121812;
+      --surface:#1B231C;
+      --surface-2:#202A20;
+      --text:#E8E6D8;
+      --text-muted:#9AA69A;
+      --border:#2C3A2C;
+      --accent:#77C2A4;
+      --accent-ink:#0F1710;
+      --accent-soft:#243B31;
+      --highlight:#E2795C;
+      --highlight-soft:#3B241C;
+      --bubble-a:#1F2A20;
+      --bubble-b:#212D24;
+      --shadow:0 1px 2px rgba(0,0,0,0.3), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121812;
+    --surface:#1B231C;
+    --surface-2:#202A20;
+    --text:#E8E6D8;
+    --text-muted:#9AA69A;
+    --border:#2C3A2C;
+    --accent:#77C2A4;
+    --accent-ink:#0F1710;
+    --accent-soft:#243B31;
+    --highlight:#E2795C;
+    --highlight-soft:#3B241C;
+    --bubble-a:#1F2A20;
+    --bubble-b:#212D24;
+    --shadow:0 1px 2px rgba(0,0,0,0.3), 0 10px 28px -14px rgba(0,0,0,0.55);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{ background:var(--bg); }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Work Sans', 'Segoe UI', sans-serif;
+    padding:0 16px;
+    padding-block:20px 48px;
+    min-height:100vh;
+    margin:0;
+  }
+  .hanzi{ font-family:'Noto Serif SC', 'Songti SC', serif; }
+
+  .wrap{ max-width:1080px; margin:0 auto; }
+
+  header.top{
+    display:flex; flex-wrap:wrap; gap:16px 24px;
+    align-items:flex-end; justify-content:space-between;
+    padding:4px 4px 20px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:20px;
+  }
+  header.top h1{
+    margin:0; font-size:1.9rem; line-height:1.15;
+    font-weight:700;
+  }
+  header.top h1 .zh{ font-size:1.5rem; color:var(--accent); margin-right:10px; }
+  header.top p.sub{ margin:6px 0 0; color:var(--text-muted); font-size:0.92rem; max-width:46ch; }
+
+  .stats{ display:flex; gap:10px; flex-wrap:wrap; }
+  .stat{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:10px 16px; text-align:center; min-width:112px; box-shadow:var(--shadow);
+  }
+  .stat .n{ font-size:1.5rem; font-weight:700; font-variant-numeric:tabular-nums; line-height:1; }
+  .stat .n.flame{ color:var(--highlight); }
+  .stat .l{ font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
+
+  .layout{ display:grid; grid-template-columns:300px 1fr; gap:24px; align-items:start; }
+  @media (max-width:760px){ .layout{ grid-template-columns:1fr; } }
+
+  .panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    box-shadow:var(--shadow);
+  }
+
+  .filters{ padding:14px 14px 4px; display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{
+    border:1px solid var(--border); background:var(--surface-2); color:var(--text-muted);
+    font-size:0.78rem; padding:5px 11px; border-radius:999px; cursor:pointer;
+    font-family:inherit; transition:background .15s, color .15s, border-color .15s;
+  }
+  .chip:hover{ border-color:var(--accent); color:var(--text); }
+  .chip.active{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+
+  .dlist{ list-style:none; margin:0; padding:8px; max-height:640px; overflow-y:auto; }
+  .dlist li{ margin:0; }
+  .ditem{
+    width:100%; text-align:left; background:none; border:none; border-radius:10px;
+    padding:10px 12px; cursor:pointer; display:flex; align-items:center; gap:10px;
+    font-family:inherit; color:var(--text);
+  }
+  .ditem:hover{ background:var(--surface-2); }
+  .ditem.active{ background:var(--accent-soft); }
+  .ditem .mark{
+    flex:none; width:20px; height:20px; border-radius:50%; border:1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:0.7rem;
+  }
+  .ditem.done .mark{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .ditem .txt{ min-width:0; }
+  .ditem .txt .zh{ font-size:1.05rem; display:block; }
+  .ditem .txt .pt{ font-size:0.76rem; color:var(--text-muted); display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ditem .theme{ margin-left:auto; flex:none; font-size:0.68rem; color:var(--text-muted); border:1px solid var(--border); border-radius:999px; padding:2px 8px; }
+
+  .viewer{ padding:22px 26px 26px; min-height:420px; display:flex; flex-direction:column; }
+
+  .empty{ margin:auto; text-align:center; color:var(--text-muted); max-width:34ch; padding:40px 10px; }
+  .empty p{ margin:6px 0 0; font-size:0.92rem; }
+  .empty button{ margin-top:16px; }
+
+  .vhead{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:18px; }
+  .vhead .titles .zh{ font-size:1.5rem; font-weight:600; display:block; }
+  .vhead .titles .pt{ color:var(--text-muted); font-size:0.9rem; display:block; margin-top:2px; }
+  .vhead .theme-tag{ font-size:0.72rem; color:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:2px 10px; display:inline-block; margin-top:8px; }
+
+  .btnrow{ display:flex; gap:8px; flex-wrap:wrap; }
+  button.ghost{
+    background:none; border:1px solid var(--border); color:var(--text);
+    padding:8px 14px; border-radius:9px; font-family:inherit; font-size:0.85rem; cursor:pointer;
+  }
+  button.ghost:hover{ border-color:var(--accent); }
+  button.solid{
+    background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    padding:8px 16px; border-radius:9px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer;
+  }
+  button.solid:hover{ filter:brightness(1.06); }
+  button.solid.done{ background:var(--surface-2); color:var(--accent); }
+  button:focus-visible, .ditem:focus-visible, .chip:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .lines{ display:flex; flex-direction:column; gap:12px; margin:6px 0 22px; }
+  .line{ display:flex; }
+  .line.spkB{ justify-content:flex-end; }
+  .bubble{
+    max-width:min(72ch, 86%); border:1px solid var(--border); border-radius:14px;
+    padding:12px 16px; cursor:pointer; background:var(--bubble-a);
+  }
+  .line.spkB .bubble{ background:var(--bubble-b); }
+  .bubble .spk{ font-size:0.68rem; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:3px; }
+  .bubble .zh{ font-size:1.35rem; line-height:1.5; }
+  .reveal{
+    max-height:0; overflow:hidden; opacity:0; transition:max-height .25s ease, opacity .2s ease, margin .2s ease;
+  }
+  .bubble.open .reveal{ max-height:120px; opacity:1; margin-top:8px; }
+  .reveal .py{ font-style:italic; color:var(--accent); font-size:0.94rem; }
+  .reveal .pt{ color:var(--text-muted); font-size:0.88rem; margin-top:2px; }
+  @media (prefers-reduced-motion:reduce){ .reveal{ transition:none; } }
+
+  .foot{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; border-top:1px solid var(--border); padding-top:16px; margin-top:auto; }
+  .hint{ font-size:0.78rem; color:var(--text-muted); }
+
+  ::-webkit-scrollbar{ width:10px; }
+  ::-webkit-scrollbar-thumb{ background:var(--border); border-radius:6px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1><span class="zh hanzi">对话</span>Dialogos HSK1</h1>
+      <p class="sub">Pratique leitura com dialogos curtos usando o vocabulario do HSK1. So os caracteres aparecem primeiro — toque em uma fala para revelar o pinyin e a traducao.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n flame" id="statStreak">0</div><div class="l">dias seguidos</div></div>
+      <div class="stat"><div class="n" id="statDone">0/20</div><div class="l">praticados</div></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="filters" id="filters"></div>
+      <ul class="dlist" id="dlist"></ul>
+    </div>
+
+    <div class="panel viewer" id="viewer">
+      <div class="empty" id="empty">
+        <div class="zh hanzi" style="font-size:2rem;">你好</div>
+        <p>Escolha um dialogo na lista ao lado para comecar a praticar a leitura.</p>
+        <button class="solid" id="startFirst">Comecar pelo primeiro nao praticado</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DIALOGUES = [
+    {id:"d01", theme:"Saudacoes", zh:"你好", pt:"Ola", lines:[
+      {s:"A", zh:"你好!", py:"Nǐ hǎo!", pt:"Ola!"},
+      {s:"B", zh:"你好!你是学生吗?", py:"Nǐ hǎo! Nǐ shì xuéshēng ma?", pt:"Ola! Voce e estudante?"},
+      {s:"A", zh:"是,我是学生。你呢?", py:"Shì, wǒ shì xuéshēng. Nǐ ne?", pt:"Sim, eu sou estudante. E voce?"},
+      {s:"B", zh:"我是老师。", py:"Wǒ shì lǎoshī.", pt:"Eu sou professor(a)."},
+      {s:"A", zh:"你叫什么名字?", py:"Nǐ jiào shénme míngzi?", pt:"Qual e o seu nome?"},
+      {s:"B", zh:"我叫李明。你呢?", py:"Wǒ jiào Lǐ Míng. Nǐ ne?", pt:"Meu nome e Li Ming. E o seu?"},
+      {s:"A", zh:"我叫王芳。", py:"Wǒ jiào Wáng Fāng.", pt:"Meu nome e Wang Fang."},
+      {s:"B", zh:"很高兴认识你。", py:"Hěn gāoxìng rènshi nǐ.", pt:"Prazer em te conhecer."},
+      {s:"A", zh:"认识你,我很高兴。", py:"Rènshi nǐ, wǒ hěn gāoxìng.", pt:"Conhecer voce, estou feliz."}
+    ]},
+    {id:"d02", theme:"Familia", zh:"我的家人", pt:"Minha familia", lines:[
+      {s:"A", zh:"这是你爸爸吗?", py:"Zhè shì nǐ bàba ma?", pt:"Este e seu pai?"},
+      {s:"B", zh:"是,这是我爸爸,那是我妈妈。", py:"Shì, zhè shì wǒ bàba, nà shì wǒ māma.", pt:"Sim, este e meu pai, aquela e minha mae."},
+      {s:"A", zh:"你有儿子吗?", py:"Nǐ yǒu érzi ma?", pt:"Voce tem filho?"},
+      {s:"B", zh:"没有,我有一个女儿。", py:"Méiyǒu, wǒ yǒu yí ge nǚér.", pt:"Nao, eu tenho uma filha."},
+      {s:"A", zh:"她几岁?", py:"Tā jǐ suì?", pt:"Quantos anos ela tem?"},
+      {s:"B", zh:"她五岁。", py:"Tā wǔ suì.", pt:"Ela tem cinco anos."},
+      {s:"A", zh:"你女儿漂亮。", py:"Nǐ nǚér piàoliang.", pt:"Sua filha e bonita."},
+      {s:"B", zh:"谢谢。", py:"Xièxie.", pt:"Obrigado(a)."}
+    ]},
+    {id:"d03", theme:"Horario", zh:"几点了", pt:"Que horas sao", lines:[
+      {s:"A", zh:"现在几点?", py:"Xiànzài jǐ diǎn?", pt:"Que horas sao agora?"},
+      {s:"B", zh:"现在八点。", py:"Xiànzài bā diǎn.", pt:"Agora sao oito horas."},
+      {s:"A", zh:"你几点去学校?", py:"Nǐ jǐ diǎn qù xuéxiào?", pt:"A que horas voce vai a escola?"},
+      {s:"B", zh:"我九点去学校。", py:"Wǒ jiǔ diǎn qù xuéxiào.", pt:"Eu vou a escola as nove."},
+      {s:"A", zh:"你几点回家?", py:"Nǐ jǐ diǎn huí jiā?", pt:"A que horas voce volta para casa?"},
+      {s:"B", zh:"我下午五点回家。", py:"Wǒ xiàwǔ wǔ diǎn huí jiā.", pt:"Eu volto para casa as cinco da tarde."}
+    ]},
+    {id:"d04", theme:"Calendario", zh:"今天星期几", pt:"Que dia e hoje", lines:[
+      {s:"A", zh:"今天几月几号?", py:"Jīntiān jǐ yuè jǐ hào?", pt:"Que dia e mes e hoje?"},
+      {s:"B", zh:"今天九月十号。", py:"Jīntiān jiǔ yuè shí hào.", pt:"Hoje e dia dez de setembro."},
+      {s:"A", zh:"今天星期几?", py:"Jīntiān xīngqī jǐ?", pt:"Que dia da semana e hoje?"},
+      {s:"B", zh:"今天星期五。", py:"Jīntiān xīngqīwǔ.", pt:"Hoje e sexta-feira."},
+      {s:"A", zh:"明天呢?", py:"Míngtiān ne?", pt:"E amanha?"},
+      {s:"B", zh:"明天星期六。", py:"Míngtiān xīngqīliù.", pt:"Amanha e sabado."}
+    ]},
+    {id:"d05", theme:"Clima", zh:"天气怎么样", pt:"Como esta o tempo", lines:[
+      {s:"A", zh:"今天天气怎么样?", py:"Jīntiān tiānqì zěnmeyàng?", pt:"Como esta o tempo hoje?"},
+      {s:"B", zh:"今天很冷。", py:"Jīntiān hěn lěng.", pt:"Hoje esta muito frio."},
+      {s:"A", zh:"明天呢?", py:"Míngtiān ne?", pt:"E amanha?"},
+      {s:"B", zh:"明天很热,不下雨。", py:"Míngtiān hěn rè, bú xiàyǔ.", pt:"Amanha vai estar muito quente, sem chuva."},
+      {s:"A", zh:"太好了!", py:"Tài hǎo le!", pt:"Otimo!"}
+    ]},
+    {id:"d06", theme:"Animais", zh:"我家的狗", pt:"O cachorro da minha casa", lines:[
+      {s:"A", zh:"你家有猫吗?", py:"Nǐ jiā yǒu māo ma?", pt:"Tem gato na sua casa?"},
+      {s:"B", zh:"没有,我家有狗。", py:"Méiyǒu, wǒ jiā yǒu gǒu.", pt:"Nao, na minha casa tem cachorro."},
+      {s:"A", zh:"狗叫什么名字?", py:"Gǒu jiào shénme míngzi?", pt:"Qual e o nome do cachorro?"},
+      {s:"B", zh:"狗叫小白。", py:"Gǒu jiào Xiǎobái.", pt:"O cachorro se chama Xiaobai."},
+      {s:"A", zh:"小白很漂亮。", py:"Xiǎobái hěn piàoliang.", pt:"Xiaobai e muito bonito."},
+      {s:"B", zh:"谢谢!", py:"Xièxie!", pt:"Obrigado!"}
+    ]},
+    {id:"d07", theme:"Compras", zh:"买苹果", pt:"Comprando macas", lines:[
+      {s:"A", zh:"你想买什么?", py:"Nǐ xiǎng mǎi shénme?", pt:"O que voce quer comprar?"},
+      {s:"B", zh:"我想买苹果。", py:"Wǒ xiǎng mǎi píngguǒ.", pt:"Eu quero comprar maca."},
+      {s:"A", zh:"苹果多少钱?", py:"Píngguǒ duōshǎo qián?", pt:"Quanto custa a maca?"},
+      {s:"B", zh:"五块钱。", py:"Wǔ kuài qián.", pt:"Cinco yuans."},
+      {s:"A", zh:"我买五个苹果。", py:"Wǒ mǎi wǔ ge píngguǒ.", pt:"Vou comprar cinco macas."},
+      {s:"B", zh:"好,谢谢。", py:"Hǎo, xièxie.", pt:"Certo, obrigado."}
+    ]},
+    {id:"d08", theme:"Objetos", zh:"这是什么", pt:"O que e isso", lines:[
+      {s:"A", zh:"这是什么?", py:"Zhè shì shénme?", pt:"O que e isso?"},
+      {s:"B", zh:"这是茶。", py:"Zhè shì chá.", pt:"Isso e cha."},
+      {s:"A", zh:"那是什么?", py:"Nà shì shénme?", pt:"O que e aquilo?"},
+      {s:"B", zh:"那是杯子。", py:"Nà shì bēizi.", pt:"Aquilo e um copo."},
+      {s:"A", zh:"我想买一个杯子。", py:"Wǒ xiǎng mǎi yí ge bēizi.", pt:"Eu quero comprar um copo."},
+      {s:"B", zh:"好的。", py:"Hǎo de.", pt:"Tudo bem."}
+    ]},
+    {id:"d09", theme:"Comida", zh:"在饭店", pt:"No restaurante", lines:[
+      {s:"A", zh:"你想吃什么?", py:"Nǐ xiǎng chī shénme?", pt:"O que voce quer comer?"},
+      {s:"B", zh:"我想吃米饭和菜。", py:"Wǒ xiǎng chī mǐfàn hé cài.", pt:"Eu quero comer arroz e um prato."},
+      {s:"A", zh:"你喝什么?", py:"Nǐ hē shénme?", pt:"O que voce vai beber?"},
+      {s:"B", zh:"我喝茶,谢谢。", py:"Wǒ hē chá, xièxie.", pt:"Eu vou beber cha, obrigado."},
+      {s:"A", zh:"好的。", py:"Hǎo de.", pt:"Certo."}
+    ]},
+    {id:"d10", theme:"Telefone", zh:"打电话", pt:"Ligacao", lines:[
+      {s:"A", zh:"喂,你好!", py:"Wéi, nǐ hǎo!", pt:"Alo, ola!"},
+      {s:"B", zh:"喂,你是谁?", py:"Wéi, nǐ shì shéi?", pt:"Alo, quem e voce?"},
+      {s:"A", zh:"我是王芳。", py:"Wǒ shì Wáng Fāng.", pt:"Eu sou Wang Fang."},
+      {s:"B", zh:"你好,王芳!", py:"Nǐ hǎo, Wáng Fāng!", pt:"Ola, Wang Fang!"},
+      {s:"A", zh:"你在家吗?", py:"Nǐ zài jiā ma?", pt:"Voce esta em casa?"},
+      {s:"B", zh:"我在家,你呢?", py:"Wǒ zài jiā, nǐ ne?", pt:"Estou em casa, e voce?"},
+      {s:"A", zh:"我在学校。", py:"Wǒ zài xuéxiào.", pt:"Estou na escola."}
+    ]},
+    {id:"d11", theme:"Saude", zh:"去医院", pt:"Indo ao hospital", lines:[
+      {s:"A", zh:"你去哪儿?", py:"Nǐ qù nǎr?", pt:"Onde voce vai?"},
+      {s:"B", zh:"我去医院。", py:"Wǒ qù yīyuàn.", pt:"Eu vou ao hospital."},
+      {s:"A", zh:"你认识那个医生吗?", py:"Nǐ rènshi nàge yīshēng ma?", pt:"Voce conhece aquele medico?"},
+      {s:"B", zh:"认识,他是我朋友。", py:"Rènshi, tā shì wǒ péngyǒu.", pt:"Conheco, ele e meu amigo."},
+      {s:"A", zh:"他叫什么名字?", py:"Tā jiào shénme míngzi?", pt:"Qual e o nome dele?"},
+      {s:"B", zh:"他叫李医生。", py:"Tā jiào Lǐ yīshēng.", pt:"Ele se chama Doutor Li."}
+    ]},
+    {id:"d12", theme:"Lazer", zh:"看电影", pt:"Assistindo um filme", lines:[
+      {s:"A", zh:"你在家做什么?", py:"Nǐ zài jiā zuò shénme?", pt:"O que voce esta fazendo em casa?"},
+      {s:"B", zh:"我在看电视。", py:"Wǒ zài kàn diànshì.", pt:"Estou assistindo TV."},
+      {s:"A", zh:"你喜欢看电影吗?", py:"Nǐ xǐhuān kàn diànyǐng ma?", pt:"Voce gosta de assistir filmes?"},
+      {s:"B", zh:"我很喜欢。", py:"Wǒ hěn xǐhuān.", pt:"Eu gosto muito."},
+      {s:"A", zh:"我们明天看电影,好吗?", py:"Wǒmen míngtiān kàn diànyǐng, hǎo ma?", pt:"Vamos ver um filme amanha, pode ser?"},
+      {s:"B", zh:"好!", py:"Hǎo!", pt:"Combinado!"}
+    ]},
+    {id:"d13", theme:"Estudos", zh:"学习汉语", pt:"Estudando chines", lines:[
+      {s:"A", zh:"你学习什么?", py:"Nǐ xuéxí shénme?", pt:"O que voce estuda?"},
+      {s:"B", zh:"我学习汉语。", py:"Wǒ xuéxí Hànyǔ.", pt:"Eu estudo chines (mandarim)."},
+      {s:"A", zh:"你喜欢汉语吗?", py:"Nǐ xǐhuān Hànyǔ ma?", pt:"Voce gosta de chines?"},
+      {s:"B", zh:"我很喜欢,汉语很好。", py:"Wǒ hěn xǐhuān, Hànyǔ hěn hǎo.", pt:"Eu gosto muito, chines e otimo."},
+      {s:"A", zh:"你会写汉字吗?", py:"Nǐ huì xiě Hànzì ma?", pt:"Voce sabe escrever caracteres chineses?"},
+      {s:"B", zh:"我会写一点儿。", py:"Wǒ huì xiě yìdiǎnr.", pt:"Eu sei escrever um pouco."}
+    ]},
+    {id:"d14", theme:"Trabalho", zh:"你的工作", pt:"Seu trabalho", lines:[
+      {s:"A", zh:"你工作吗?", py:"Nǐ gōngzuò ma?", pt:"Voce trabalha?"},
+      {s:"B", zh:"我工作,我是老师。", py:"Wǒ gōngzuò, wǒ shì lǎoshī.", pt:"Eu trabalho, sou professor(a)."},
+      {s:"A", zh:"你在哪儿工作?", py:"Nǐ zài nǎr gōngzuò?", pt:"Onde voce trabalha?"},
+      {s:"B", zh:"我在学校工作。", py:"Wǒ zài xuéxiào gōngzuò.", pt:"Eu trabalho na escola."},
+      {s:"A", zh:"你喜欢你的工作吗?", py:"Nǐ xǐhuān nǐ de gōngzuò ma?", pt:"Voce gosta do seu trabalho?"},
+      {s:"B", zh:"我很喜欢。", py:"Wǒ hěn xǐhuān.", pt:"Eu gosto muito."}
+    ]},
+    {id:"d15", theme:"Viagem", zh:"去北京", pt:"Indo para Pequim", lines:[
+      {s:"A", zh:"你去北京吗?", py:"Nǐ qù Běijīng ma?", pt:"Voce vai para Pequim?"},
+      {s:"B", zh:"是,我去北京。", py:"Shì, wǒ qù Běijīng.", pt:"Sim, eu vou para Pequim."},
+      {s:"A", zh:"你坐飞机去吗?", py:"Nǐ zuò fēijī qù ma?", pt:"Voce vai de aviao?"},
+      {s:"B", zh:"是,我坐飞机去。", py:"Shì, wǒ zuò fēijī qù.", pt:"Sim, eu vou de aviao."},
+      {s:"A", zh:"飞机几点?", py:"Fēijī jǐ diǎn?", pt:"Que horas e o voo?"},
+      {s:"B", zh:"飞机下午三点。", py:"Fēijī xiàwǔ sān diǎn.", pt:"O voo e as tres da tarde."}
+    ]},
+    {id:"d16", theme:"Cortesia", zh:"对不起", pt:"Desculpas", lines:[
+      {s:"A", zh:"这是你的书吗?", py:"Zhè shì nǐ de shū ma?", pt:"Este e o seu livro?"},
+      {s:"B", zh:"是,谢谢你。", py:"Shì, xièxie nǐ.", pt:"Sim, obrigado."},
+      {s:"A", zh:"不客气。", py:"Bú kèqi.", pt:"De nada."},
+      {s:"B", zh:"对不起!", py:"Duìbùqǐ!", pt:"Desculpe!"},
+      {s:"A", zh:"没关系。", py:"Méi guānxi.", pt:"Nao tem problema."}
+    ]},
+    {id:"d17", theme:"Rotina", zh:"周末计划", pt:"Planos de fim de semana", lines:[
+      {s:"A", zh:"明天你做什么?", py:"Míngtiān nǐ zuò shénme?", pt:"O que voce vai fazer amanha?"},
+      {s:"B", zh:"我在家看书。", py:"Wǒ zài jiā kàn shū.", pt:"Vou ficar em casa lendo."},
+      {s:"A", zh:"你不去学校吗?", py:"Nǐ bú qù xuéxiào ma?", pt:"Voce nao vai para a escola?"},
+      {s:"B", zh:"明天是星期六,我不去学校。", py:"Míngtiān shì xīngqīliù, wǒ bú qù xuéxiào.", pt:"Amanha e sabado, eu nao vou para a escola."},
+      {s:"A", zh:"我们看电影,好吗?", py:"Wǒmen kàn diànyǐng, hǎo ma?", pt:"Vamos ver um filme, pode ser?"},
+      {s:"B", zh:"好!几点?", py:"Hǎo! Jǐ diǎn?", pt:"Combinado! Que horas?"},
+      {s:"A", zh:"下午四点。", py:"Xiàwǔ sì diǎn.", pt:"As quatro da tarde."}
+    ]},
+    {id:"d18", theme:"Objetos", zh:"桌子上有什么", pt:"O que tem na mesa", lines:[
+      {s:"A", zh:"这是什么?", py:"Zhè shì shénme?", pt:"O que e isso?"},
+      {s:"B", zh:"这是桌子和椅子。", py:"Zhè shì zhuōzi hé yǐzi.", pt:"Isso e uma mesa e uma cadeira."},
+      {s:"A", zh:"桌子上有什么?", py:"Zhuōzi shàng yǒu shénme?", pt:"O que tem em cima da mesa?"},
+      {s:"B", zh:"桌子上有书和杯子。", py:"Zhuōzi shàng yǒu shū hé bēizi.", pt:"Em cima da mesa tem um livro e um copo."},
+      {s:"A", zh:"里面有水吗?", py:"Lǐmiàn yǒu shuǐ ma?", pt:"Tem agua dentro?"},
+      {s:"B", zh:"有,杯子里面有水。", py:"Yǒu, bēizi lǐmiàn yǒu shuǐ.", pt:"Tem, dentro do copo tem agua."}
+    ]},
+    {id:"d19", theme:"Compras", zh:"买衣服", pt:"Comprando roupa", lines:[
+      {s:"A", zh:"你想买什么衣服?", py:"Nǐ xiǎng mǎi shénme yīfu?", pt:"Que roupa voce quer comprar?"},
+      {s:"B", zh:"我想买衣服,这个太大。", py:"Wǒ xiǎng mǎi yīfu, zhège tài dà.", pt:"Eu quero comprar roupa, esta e grande demais."},
+      {s:"A", zh:"那个呢?", py:"Nàge ne?", pt:"E aquela?"},
+      {s:"B", zh:"那个很好,不大不小。", py:"Nàge hěn hǎo, bú dà bù xiǎo.", pt:"Aquela esta boa, nem grande nem pequena."},
+      {s:"A", zh:"多少钱?", py:"Duōshǎo qián?", pt:"Quanto custa?"},
+      {s:"B", zh:"三十块钱。", py:"Sānshí kuài qián.", pt:"Trinta yuans."}
+    ]},
+    {id:"d20", theme:"Rotina", zh:"几点睡觉", pt:"A que horas dormir", lines:[
+      {s:"A", zh:"你几点睡觉?", py:"Nǐ jǐ diǎn shuìjiào?", pt:"A que horas voce dorme?"},
+      {s:"B", zh:"我十点睡觉。", py:"Wǒ shí diǎn shuìjiào.", pt:"Eu durmo as dez."},
+      {s:"A", zh:"你几点工作?", py:"Nǐ jǐ diǎn gōngzuò?", pt:"A que horas voce trabalha?"},
+      {s:"B", zh:"我上午九点工作。", py:"Wǒ shàngwǔ jiǔ diǎn gōngzuò.", pt:"Eu trabalho as nove da manha."},
+      {s:"A", zh:"你能几点回家?", py:"Nǐ néng jǐ diǎn huí jiā?", pt:"A que horas voce pode voltar para casa?"},
+      {s:"B", zh:"我下午五点回家。", py:"Wǒ xiàwǔ wǔ diǎn huí jiā.", pt:"Eu volto para casa as cinco da tarde."}
+    ]}
+  ];
+
+  var TOTAL = DIALOGUES.length;
+  var THEMES = [];
+  DIALOGUES.forEach(function(d){ if(THEMES.indexOf(d.theme)===-1) THEMES.push(d.theme); });
+
+  var STORAGE_KEY = "dialogos-hsk1-progresso";
+  var state = { completedIds:[], history:{} };
+  var currentId = null;
+  var activeFilter = "Todos";
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var data = JSON.parse(raw);
+        state.completedIds = Array.isArray(data.completedIds) ? data.completedIds : [];
+        state.history = (data.history && typeof data.history === "object") ? data.history : {};
+      }
+    }catch(e){ /* localStorage indisponivel: segue so em memoria */ }
+  }
+
+  function saveState(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){ /* best effort */ }
+  }
+
+  function todayLocal(){
+    var d = new Date();
+    var y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,"0"), day = String(d.getDate()).padStart(2,"0");
+    return y+"-"+m+"-"+day;
+  }
+
+  function computeStreak(history){
+    var dates = Object.keys(history).filter(function(k){ return history[k]; });
+    if(dates.length===0) return 0;
+    var set = {}; dates.forEach(function(k){ set[k]=true; });
+    var d = new Date();
+    var todayStr = todayLocal();
+    if(!set[todayStr]){
+      d.setDate(d.getDate()-1);
+    }
+    var streak = 0;
+    while(true){
+      var y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,"0"), day = String(d.getDate()).padStart(2,"0");
+      var key = y+"-"+m+"-"+day;
+      if(set[key]){ streak++; d.setDate(d.getDate()-1); } else { break; }
+    }
+    return streak;
+  }
+
+  function renderFilters(){
+    var el = document.getElementById("filters");
+    el.innerHTML = "";
+    var all = ["Todos"].concat(THEMES);
+    all.forEach(function(t){
+      var b = document.createElement("button");
+      b.className = "chip" + (t===activeFilter ? " active" : "");
+      b.type = "button";
+      b.textContent = t;
+      b.addEventListener("click", function(){ activeFilter = t; renderList(); });
+      el.appendChild(b);
+    });
+  }
+
+  function renderStats(){
+    document.getElementById("statStreak").textContent = String(computeStreak(state.history));
+    document.getElementById("statDone").textContent = state.completedIds.length + "/" + TOTAL;
+  }
+
+  function renderList(){
+    renderFilters();
+    var ul = document.getElementById("dlist");
+    ul.innerHTML = "";
+    var items = DIALOGUES.filter(function(d){ return activeFilter==="Todos" || d.theme===activeFilter; });
+    items.forEach(function(d){
+      var li = document.createElement("li");
+      var done = state.completedIds.indexOf(d.id) !== -1;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "ditem" + (done ? " done":"") + (d.id===currentId ? " active":"");
+      btn.innerHTML =
+        '<span class="mark">' + (done ? "&#10003;" : "") + '</span>' +
+        '<span class="txt"><span class="zh hanzi">' + d.zh + '</span><span class="pt">' + d.pt + '</span></span>' +
+        '<span class="theme">' + d.theme + '</span>';
+      btn.addEventListener("click", function(){ openDialogue(d.id); });
+      li.appendChild(btn);
+      ul.appendChild(li);
+    });
+  }
+
+  function openDialogue(id){
+    currentId = id;
+    var d = DIALOGUES.find(function(x){ return x.id===id; });
+    var v = document.getElementById("viewer");
+    v.innerHTML = "";
+
+    var head = document.createElement("div");
+    head.className = "vhead";
+    var done = state.completedIds.indexOf(d.id) !== -1;
+    head.innerHTML =
+      '<div class="titles">' +
+        '<span class="zh hanzi">' + d.zh + '</span>' +
+        '<span class="pt">' + d.pt + '</span>' +
+        '<span class="theme-tag">' + d.theme + '</span>' +
+      '</div>' +
+      '<div class="btnrow">' +
+        '<button class="ghost" id="toggleAll" type="button">Mostrar tudo</button>' +
+      '</div>';
+    v.appendChild(head);
+
+    var lines = document.createElement("div");
+    lines.className = "lines";
+    d.lines.forEach(function(ln, idx){
+      var row = document.createElement("div");
+      row.className = "line spk" + ln.s;
+      var b = document.createElement("div");
+      b.className = "bubble";
+      b.tabIndex = 0;
+      b.setAttribute("role","button");
+      b.innerHTML =
+        '<div class="spk">Falante ' + ln.s + '</div>' +
+        '<div class="zh hanzi">' + ln.zh + '</div>' +
+        '<div class="reveal"><div class="py">' + ln.py + '</div><div class="pt">' + ln.pt + '</div></div>';
+      function toggle(){ b.classList.toggle("open"); }
+      b.addEventListener("click", toggle);
+      b.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); }});
+      row.appendChild(b);
+      lines.appendChild(row);
+    });
+    v.appendChild(lines);
+
+    var foot = document.createElement("div");
+    foot.className = "foot";
+    foot.innerHTML =
+      '<span class="hint">Toque em cada fala para revelar o pinyin e a traducao.</span>' +
+      '<button class="solid' + (done?" done":"") + '" id="markDone" type="button">' +
+        (done ? "Praticado hoje &#10003;" : "Marcar como praticado") +
+      '</button>';
+    v.appendChild(foot);
+
+    document.getElementById("toggleAll").addEventListener("click", function(){
+      var bubbles = lines.querySelectorAll(".bubble");
+      var anyClosed = Array.prototype.some.call(bubbles, function(bb){ return !bb.classList.contains("open"); });
+      bubbles.forEach(function(bb){ bb.classList.toggle("open", anyClosed); });
+      this.textContent = anyClosed ? "Esconder tudo" : "Mostrar tudo";
+    });
+
+    document.getElementById("markDone").addEventListener("click", function(){
+      togglePracticed(d.id);
+    });
+
+    renderList();
+  }
+
+  function togglePracticed(id){
+    var i = state.completedIds.indexOf(id);
+    if(i===-1){
+      state.completedIds.push(id);
+    } else {
+      state.completedIds.splice(i,1);
+    }
+    state.history[todayLocal()] = true;
+    saveState();
+    renderStats();
+    if(currentId===id) openDialogue(id);
+    else renderList();
+  }
+
+  document.getElementById("startFirst").addEventListener("click", function(){
+    var next = DIALOGUES.find(function(d){ return state.completedIds.indexOf(d.id)===-1; }) || DIALOGUES[0];
+    openDialogue(next.id);
+  });
+
+  loadState();
+  renderStats();
+  renderList();
+})();
+</script>
+</body>
+</html>
