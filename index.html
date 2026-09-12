@@ -21,6 +21,10 @@
     --highlight-soft:#F3DAD1;
     --bubble-a:#FFFFFF;
     --bubble-b:#EFF3EA;
+    --good:#3D7A44;
+    --good-soft:#DCEFDD;
+    --bad:#AA3B2F;
+    --bad-soft:#F5DCD8;
     --shadow:0 1px 2px rgba(32,38,31,0.06), 0 8px 24px -12px rgba(32,38,31,0.12);
   }
   @media (prefers-color-scheme: dark){
@@ -38,6 +42,10 @@
       --highlight-soft:#3B241C;
       --bubble-a:#1F2A20;
       --bubble-b:#212D24;
+      --good:#7FCB86;
+      --good-soft:#203327;
+      --bad:#E68A7C;
+      --bad-soft:#3A2420;
       --shadow:0 1px 2px rgba(0,0,0,0.3), 0 10px 28px -14px rgba(0,0,0,0.55);
     }
   }
@@ -55,6 +63,10 @@
     --highlight-soft:#3B241C;
     --bubble-a:#1F2A20;
     --bubble-b:#212D24;
+    --good:#7FCB86;
+    --good-soft:#203327;
+    --bad:#E68A7C;
+    --bad-soft:#3A2420;
     --shadow:0 1px 2px rgba(0,0,0,0.3), 0 10px 28px -14px rgba(0,0,0,0.55);
   }
 
@@ -70,6 +82,7 @@
     margin:0;
   }
   .hanzi{ font-family:'Noto Serif SC', 'Songti SC', serif; }
+  [hidden]{ display:none !important; }
 
   .wrap{ max-width:1080px; margin:0 auto; }
 
@@ -78,7 +91,7 @@
     align-items:flex-end; justify-content:space-between;
     padding:4px 4px 20px;
     border-bottom:1px solid var(--border);
-    margin-bottom:20px;
+    margin-bottom:16px;
   }
   header.top h1{
     margin:0; font-size:1.9rem; line-height:1.15;
@@ -90,11 +103,20 @@
   .stats{ display:flex; gap:10px; flex-wrap:wrap; }
   .stat{
     background:var(--surface); border:1px solid var(--border); border-radius:12px;
-    padding:10px 16px; text-align:center; min-width:112px; box-shadow:var(--shadow);
+    padding:10px 16px; text-align:center; min-width:100px; box-shadow:var(--shadow);
   }
   .stat .n{ font-size:1.5rem; font-weight:700; font-variant-numeric:tabular-nums; line-height:1; }
   .stat .n.flame{ color:var(--highlight); }
   .stat .l{ font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
+
+  .tabbar{ display:flex; gap:8px; margin:18px 0 20px; }
+  .tab{
+    border:1px solid var(--border); background:var(--surface); color:var(--text-muted);
+    font-family:inherit; font-size:0.9rem; font-weight:600; padding:9px 18px; border-radius:10px;
+    cursor:pointer;
+  }
+  .tab.active{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .tab:hover:not(.active){ border-color:var(--accent); color:var(--text); }
 
   .layout{ display:grid; grid-template-columns:300px 1fr; gap:24px; align-items:start; }
   @media (max-width:760px){ .layout{ grid-template-columns:1fr; } }
@@ -149,13 +171,14 @@
     padding:8px 14px; border-radius:9px; font-family:inherit; font-size:0.85rem; cursor:pointer;
   }
   button.ghost:hover{ border-color:var(--accent); }
+  button.ghost:disabled{ opacity:0.4; cursor:not-allowed; }
   button.solid{
     background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
     padding:8px 16px; border-radius:9px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer;
   }
   button.solid:hover{ filter:brightness(1.06); }
   button.solid.done{ background:var(--surface-2); color:var(--accent); }
-  button:focus-visible, .ditem:focus-visible, .chip:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  button:focus-visible, .ditem:focus-visible, .chip:focus-visible, .tab:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 
   .lines{ display:flex; flex-direction:column; gap:12px; margin:6px 0 22px; }
   .line{ display:flex; }
@@ -178,6 +201,56 @@
   .foot{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; border-top:1px solid var(--border); padding-top:16px; margin-top:auto; }
   .hint{ font-size:0.78rem; color:var(--text-muted); }
 
+  /* Completar frases */
+  .clozeWrap{ padding:26px 28px 28px; }
+  .clozeTop{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+  .clozeTop .count{ font-size:0.82rem; color:var(--text-muted); }
+  .clozeTop .score{ font-size:0.82rem; color:var(--accent); font-weight:600; }
+  .dots{ display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 26px; }
+  .dot{
+    width:11px; height:11px; border-radius:50%; border:1.5px solid var(--border); background:none;
+    padding:0; cursor:pointer;
+  }
+  .dot.current{ border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-soft); }
+  .dot.right{ background:var(--good); border-color:var(--good); }
+  .dot.wrong{ background:var(--bad); border-color:var(--bad); }
+
+  .clozeCard{ text-align:center; padding:10px 6px 6px; }
+  .clozeSentence{ font-size:1.6rem; line-height:1.7; margin-bottom:10px; }
+  .blank{
+    display:inline-block; min-width:2.4em; border-bottom:2px dashed var(--accent);
+    color:var(--accent); font-weight:600; margin:0 2px;
+  }
+  .blank.filled{ border-bottom-style:solid; }
+  .hintRow{ margin-bottom:26px; }
+  .clozePt{ color:var(--text-muted); font-size:0.95rem; margin-top:10px; }
+
+  .options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:520px; margin:0 auto; }
+  @media (max-width:520px){ .options{ grid-template-columns:1fr; } }
+  .opt{
+    border:1.5px solid var(--border); background:var(--surface-2); border-radius:12px;
+    padding:12px 10px; cursor:pointer; font-family:inherit; text-align:center;
+  }
+  .opt .zh{ font-size:1.25rem; display:block; }
+  .opt .py{ font-size:0.78rem; color:var(--text-muted); font-style:italic; display:block; margin-top:2px; }
+  .opt .pt{ font-size:0.76rem; color:var(--text-muted); display:block; }
+  .opt:hover:not(:disabled){ border-color:var(--accent); }
+  .opt:disabled{ cursor:default; }
+  .opt.correct{ background:var(--good-soft); border-color:var(--good); }
+  .opt.wrong{ background:var(--bad-soft); border-color:var(--bad); }
+
+  .clozeReveal{ margin-top:22px; font-size:0.92rem; color:var(--text-muted); min-height:1.4em; }
+  .clozeReveal .py{ font-style:italic; color:var(--accent); }
+  .clozeReveal .msg{ font-weight:600; }
+  .clozeReveal .msg.right{ color:var(--good); }
+  .clozeReveal .msg.wrong{ color:var(--bad); }
+
+  .clozeNav{ display:flex; justify-content:center; gap:10px; margin-top:24px; }
+
+  .summaryScore{ font-size:3rem; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; margin:18px 0 8px; }
+  .summaryMsg{ color:var(--text-muted); font-size:1rem; margin-bottom:28px; }
+  .summaryActions{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+
   ::-webkit-scrollbar{ width:10px; }
   ::-webkit-scrollbar-thumb{ background:var(--border); border-radius:6px; }
 </style>
@@ -188,15 +261,21 @@
   <header class="top">
     <div>
       <h1><span class="zh hanzi">对话</span>Dialogos HSK1</h1>
-      <p class="sub">Pratique leitura com dialogos curtos usando o vocabulario do HSK1. So os caracteres aparecem primeiro — toque em uma fala para revelar o pinyin e a traducao.</p>
+      <p class="sub">Pratique leitura e vocabulario com o HSK1 — dialogos so com caracteres e frases para completar.</p>
     </div>
     <div class="stats">
       <div class="stat"><div class="n flame" id="statStreak">0</div><div class="l">dias seguidos</div></div>
-      <div class="stat"><div class="n" id="statDone">0/20</div><div class="l">praticados</div></div>
+      <div class="stat"><div class="n" id="statDone">0/20</div><div class="l">dialogos</div></div>
+      <div class="stat"><div class="n" id="statCloze">0/18</div><div class="l">frases</div></div>
     </div>
   </header>
 
-  <div class="layout">
+  <div class="tabbar">
+    <button class="tab active" id="tabDialogos" type="button">Dialogos</button>
+    <button class="tab" id="tabCloze" type="button">Completar frases</button>
+  </div>
+
+  <div class="layout" id="viewDialogos">
     <div class="panel">
       <div class="filters" id="filters"></div>
       <ul class="dlist" id="dlist"></ul>
@@ -209,6 +288,15 @@
         <button class="solid" id="startFirst">Comecar pelo primeiro nao praticado</button>
       </div>
     </div>
+  </div>
+
+  <div class="panel clozeWrap" id="viewCloze" hidden>
+    <div class="clozeTop">
+      <span class="count" id="clozeCount">Frase 1 de 18</span>
+      <span class="score" id="clozeScore">Acertos: 0/18</span>
+    </div>
+    <div class="dots" id="clozeDots"></div>
+    <div class="clozeCard" id="clozeCard"></div>
   </div>
 </div>
 
@@ -383,14 +471,90 @@
     ]}
   ];
 
+  var CLOZE = [
+    {id:"c01", before:"今天我", after:"学校。", full:"Jīntiān wǒ qù xuéxiào.", pt:"Hoje eu vou a escola.",
+      correct:{zh:"去", py:"qù", pt:"ir"},
+      opts:[{zh:"吃", py:"chī", pt:"comer"},{zh:"回", py:"huí", pt:"voltar"},{zh:"看", py:"kàn", pt:"ver"}]},
+    {id:"c02", before:"我", after:"米饭和菜。", full:"Wǒ chī mǐfàn hé cài.", pt:"Eu como arroz e um prato.",
+      correct:{zh:"吃", py:"chī", pt:"comer"},
+      opts:[{zh:"喝", py:"hē", pt:"beber"},{zh:"买", py:"mǎi", pt:"comprar"},{zh:"看", py:"kàn", pt:"ver"}]},
+    {id:"c03", before:"下午我", after:"家。", full:"Xiàwǔ wǒ huí jiā.", pt:"Eu volto para casa a tarde.",
+      correct:{zh:"回", py:"huí", pt:"voltar"},
+      opts:[{zh:"去", py:"qù", pt:"ir"},{zh:"来", py:"lái", pt:"vir"},{zh:"在", py:"zài", pt:"estar em"}]},
+    {id:"c04", before:"你", after:"什么?", full:"Nǐ kàn shénme?", pt:"O que voce esta assistindo?",
+      correct:{zh:"看", py:"kàn", pt:"ver, assistir"},
+      opts:[{zh:"听", py:"tīng", pt:"ouvir"},{zh:"说", py:"shuō", pt:"falar"},{zh:"写", py:"xiě", pt:"escrever"}]},
+    {id:"c05", before:"我", after:"汉语。", full:"Wǒ xuéxí Hànyǔ.", pt:"Eu estudo chines.",
+      correct:{zh:"学习", py:"xuéxí", pt:"estudar"},
+      opts:[{zh:"工作", py:"gōngzuò", pt:"trabalhar"},{zh:"认识", py:"rènshi", pt:"conhecer"},{zh:"喝", py:"hē", pt:"beber"}]},
+    {id:"c06", before:"我", after:"吃苹果。", full:"Wǒ xiǎng chī píngguǒ.", pt:"Eu quero comer maca.",
+      correct:{zh:"想", py:"xiǎng", pt:"querer"},
+      opts:[{zh:"会", py:"huì", pt:"saber (fazer)"},{zh:"能", py:"néng", pt:"poder, conseguir"},{zh:"是", py:"shì", pt:"ser"}]},
+    {id:"c07", before:"他", after:"我朋友。", full:"Tā shì wǒ péngyǒu.", pt:"Ele e meu amigo.",
+      correct:{zh:"是", py:"shì", pt:"ser"},
+      opts:[{zh:"有", py:"yǒu", pt:"ter"},{zh:"在", py:"zài", pt:"estar em"},{zh:"叫", py:"jiào", pt:"chamar-se"}]},
+    {id:"c08", before:"我", after:"一个女儿。", full:"Wǒ yǒu yí ge nǚér.", pt:"Eu tenho uma filha.",
+      correct:{zh:"有", py:"yǒu", pt:"ter"},
+      opts:[{zh:"是", py:"shì", pt:"ser"},{zh:"想", py:"xiǎng", pt:"querer"},{zh:"去", py:"qù", pt:"ir"}]},
+    {id:"c09", before:"你", after:"什么名字?", full:"Nǐ jiào shénme míngzi?", pt:"Qual e o seu nome?",
+      correct:{zh:"叫", py:"jiào", pt:"chamar-se"},
+      opts:[{zh:"是", py:"shì", pt:"ser"},{zh:"有", py:"yǒu", pt:"ter"},{zh:"想", py:"xiǎng", pt:"querer"}]},
+    {id:"c10", before:"我", after:"北京。", full:"Wǒ qù Běijīng.", pt:"Eu vou para Pequim.",
+      correct:{zh:"去", py:"qù", pt:"ir"},
+      opts:[{zh:"在", py:"zài", pt:"estar em"},{zh:"是", py:"shì", pt:"ser"},{zh:"有", py:"yǒu", pt:"ter"}]},
+    {id:"c11", before:"我在医院", after:"。", full:"Wǒ zài yīyuàn gōngzuò.", pt:"Eu trabalho no hospital.",
+      correct:{zh:"工作", py:"gōngzuò", pt:"trabalhar"},
+      opts:[{zh:"学习", py:"xuéxí", pt:"estudar"},{zh:"睡觉", py:"shuìjiào", pt:"dormir"},{zh:"看", py:"kàn", pt:"ver"}]},
+    {id:"c12", before:"我", after:"写汉字。", full:"Wǒ huì xiě Hànzì.", pt:"Eu sei escrever caracteres chineses.",
+      correct:{zh:"会", py:"huì", pt:"saber (fazer)"},
+      opts:[{zh:"能", py:"néng", pt:"poder, conseguir"},{zh:"想", py:"xiǎng", pt:"querer"},{zh:"是", py:"shì", pt:"ser"}]},
+    {id:"c13", before:"你", after:"几点回家?", full:"Nǐ néng jǐ diǎn huí jiā?", pt:"A que horas voce pode voltar para casa?",
+      correct:{zh:"能", py:"néng", pt:"poder, conseguir"},
+      opts:[{zh:"会", py:"huì", pt:"saber (fazer)"},{zh:"想", py:"xiǎng", pt:"querer"},{zh:"去", py:"qù", pt:"ir"}]},
+    {id:"c14", before:"今天", after:"热,不下雨。", full:"Jīntiān hěn rè, bú xiàyǔ.", pt:"Hoje esta muito quente, sem chuva.",
+      correct:{zh:"很", py:"hěn", pt:"muito"},
+      opts:[{zh:"太", py:"tài", pt:"demais"},{zh:"都", py:"dōu", pt:"todos"},{zh:"不", py:"bù", pt:"nao"}]},
+    {id:"c15", before:"这个", after:"大,那个很好。", full:"Zhège tài dà, nàge hěn hǎo.", pt:"Este e grande demais, aquele esta bom.",
+      correct:{zh:"太", py:"tài", pt:"demais"},
+      opts:[{zh:"很", py:"hěn", pt:"muito"},{zh:"都", py:"dōu", pt:"todos"},{zh:"不", py:"bù", pt:"nao"}]},
+    {id:"c16", before:"这是我", after:"书。", full:"Zhè shì wǒ de shū.", pt:"Este e o meu livro.",
+      correct:{zh:"的", py:"de", pt:"(particula de posse)"},
+      opts:[{zh:"了", py:"le", pt:"(particula final)"},{zh:"吗", py:"ma", pt:"(particula de pergunta)"},{zh:"呢", py:"ne", pt:"(particula)"}]},
+    {id:"c17", before:"你是学生", after:"?", full:"Nǐ shì xuéshēng ma?", pt:"Voce e estudante?",
+      correct:{zh:"吗", py:"ma", pt:"(particula de pergunta)"},
+      opts:[{zh:"呢", py:"ne", pt:"(particula)"},{zh:"的", py:"de", pt:"(particula de posse)"},{zh:"了", py:"le", pt:"(particula final)"}]},
+    {id:"c18", before:"我是学生,你", after:"?", full:"Wǒ shì xuéshēng, nǐ ne?", pt:"Eu sou estudante, e voce?",
+      correct:{zh:"呢", py:"ne", pt:"e voce?"},
+      opts:[{zh:"吗", py:"ma", pt:"(particula de pergunta)"},{zh:"的", py:"de", pt:"(particula de posse)"},{zh:"了", py:"le", pt:"(particula final)"}]}
+  ];
+
   var TOTAL = DIALOGUES.length;
+  var CTOTAL = CLOZE.length;
   var THEMES = [];
   DIALOGUES.forEach(function(d){ if(THEMES.indexOf(d.theme)===-1) THEMES.push(d.theme); });
 
   var STORAGE_KEY = "dialogos-hsk1-progresso";
-  var state = { completedIds:[], history:{} };
+  var state = { completedIds:[], history:{}, clozeCorrectIds:[] };
   var currentId = null;
   var activeFilter = "Todos";
+
+  var clozeOrder = CLOZE.map(function(e){ return e.id; });
+  var clozeIndex = 0;
+  var clozeView = "exercise"; // "exercise" | "summary"
+  var clozeAnswered = {};
+  var clozeOptionOrder = {};
+  var clozeHintOpen = {};
+
+  function clozeById(id){ return CLOZE.find(function(e){ return e.id===id; }); }
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+    }
+    return a;
+  }
 
   function loadState(){
     try{
@@ -399,6 +563,7 @@
         var data = JSON.parse(raw);
         state.completedIds = Array.isArray(data.completedIds) ? data.completedIds : [];
         state.history = (data.history && typeof data.history === "object") ? data.history : {};
+        state.clozeCorrectIds = Array.isArray(data.clozeCorrectIds) ? data.clozeCorrectIds : [];
       }
     }catch(e){ /* localStorage indisponivel: segue so em memoria */ }
   }
@@ -433,6 +598,24 @@
     return streak;
   }
 
+  function markStudiedToday(){
+    state.history[todayLocal()] = true;
+  }
+
+  /* ---------- Tabs ---------- */
+  function switchTab(tab){
+    var d = document.getElementById("viewDialogos");
+    var c = document.getElementById("viewCloze");
+    document.getElementById("tabDialogos").classList.toggle("active", tab==="dialogos");
+    document.getElementById("tabCloze").classList.toggle("active", tab==="cloze");
+    d.hidden = tab!=="dialogos";
+    c.hidden = tab!=="cloze";
+    if(tab==="cloze"){ renderCloze(); }
+  }
+  document.getElementById("tabDialogos").addEventListener("click", function(){ switchTab("dialogos"); });
+  document.getElementById("tabCloze").addEventListener("click", function(){ switchTab("cloze"); });
+
+  /* ---------- Dialogos ---------- */
   function renderFilters(){
     var el = document.getElementById("filters");
     el.innerHTML = "";
@@ -450,6 +633,7 @@
   function renderStats(){
     document.getElementById("statStreak").textContent = String(computeStreak(state.history));
     document.getElementById("statDone").textContent = state.completedIds.length + "/" + TOTAL;
+    document.getElementById("statCloze").textContent = state.clozeCorrectIds.length + "/" + CTOTAL;
   }
 
   function renderList(){
@@ -495,7 +679,7 @@
 
     var lines = document.createElement("div");
     lines.className = "lines";
-    d.lines.forEach(function(ln, idx){
+    d.lines.forEach(function(ln){
       var row = document.createElement("div");
       row.className = "line spk" + ln.s;
       var b = document.createElement("div");
@@ -544,23 +728,194 @@
     } else {
       state.completedIds.splice(i,1);
     }
-    state.history[todayLocal()] = true;
+    markStudiedToday();
     saveState();
     renderStats();
     if(currentId===id) openDialogue(id);
     else renderList();
   }
-  
 
   document.getElementById("startFirst").addEventListener("click", function(){
     var next = DIALOGUES.find(function(d){ return state.completedIds.indexOf(d.id)===-1; }) || DIALOGUES[0];
+    switchTab("dialogos");
     openDialogue(next.id);
   });
 
+  /* ---------- Completar frases (cloze) ---------- */
+  function renderClozeDots(){
+    var wrap = document.getElementById("clozeDots");
+    wrap.innerHTML = "";
+    if(clozeView === "summary") return;
+    clozeOrder.forEach(function(id, i){
+      var ex = clozeById(id);
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "dot";
+      if(i===clozeIndex) b.classList.add("current");
+      var st = clozeAnswered[ex.id] || null;
+      if(st) b.classList.add(st);
+      b.title = "Frase " + (i+1);
+      b.addEventListener("click", function(){ clozeIndex = i; clozeView = "exercise"; renderCloze(); });
+      wrap.appendChild(b);
+    });
+  }
+
+  function renderClozeSummary(){
+    document.getElementById("clozeCount").textContent = "Resultado final";
+    document.getElementById("clozeScore").textContent = "Acertos: " + state.clozeCorrectIds.length + "/" + CTOTAL;
+    renderClozeDots();
+
+    var n = state.clozeCorrectIds.length;
+    var pct = n / CTOTAL;
+    var msg;
+    if(pct === 1) msg = "Perfeito! Voce acertou todas as frases.";
+    else if(pct >= 0.7) msg = "Muito bem! Voce ja domina boa parte do vocabulario.";
+    else if(pct >= 0.4) msg = "Bom progresso — vale a pena revisar algumas palavras.";
+    else msg = "Vale a pena repetir essas frases para fixar o vocabulario.";
+
+    var card = document.getElementById("clozeCard");
+    card.innerHTML = "";
+
+    var score = document.createElement("div");
+    score.className = "summaryScore";
+    score.textContent = n + "/" + CTOTAL;
+    card.appendChild(score);
+
+    var m = document.createElement("div");
+    m.className = "summaryMsg";
+    m.textContent = msg;
+    card.appendChild(m);
+
+    var actions = document.createElement("div");
+    actions.className = "summaryActions";
+    var review = document.createElement("button");
+    review.className = "ghost"; review.type = "button"; review.textContent = "Revisar respostas";
+    review.addEventListener("click", function(){ clozeView = "exercise"; clozeIndex = 0; renderCloze(); });
+    var restart = document.createElement("button");
+    restart.className = "solid"; restart.type = "button"; restart.textContent = "Reiniciar com novas opcoes";
+    restart.addEventListener("click", restartCloze);
+    actions.appendChild(review); actions.appendChild(restart);
+    card.appendChild(actions);
+  }
+
+  function restartCloze(){
+    clozeOrder = shuffle(CLOZE.map(function(e){ return e.id; }));
+    clozeOptionOrder = {};
+    clozeAnswered = {};
+    clozeHintOpen = {};
+    clozeIndex = 0;
+    clozeView = "exercise";
+    state.clozeCorrectIds = [];
+    markStudiedToday();
+    saveState();
+    renderStats();
+    renderCloze();
+  }
+
+  function renderCloze(){
+    if(clozeView === "summary"){ renderClozeSummary(); return; }
+    var ex = clozeById(clozeOrder[clozeIndex]);
+    document.getElementById("clozeCount").textContent = "Frase " + (clozeIndex+1) + " de " + CTOTAL;
+    document.getElementById("clozeScore").textContent = "Acertos: " + state.clozeCorrectIds.length + "/" + CTOTAL;
+    renderClozeDots();
+
+    if(!clozeOptionOrder[ex.id]){
+      clozeOptionOrder[ex.id] = shuffle(ex.opts.concat([ex.correct]));
+    }
+    var options = clozeOptionOrder[ex.id];
+    var answeredState = clozeAnswered[ex.id] || null;
+
+    var card = document.getElementById("clozeCard");
+    card.innerHTML = "";
+
+    var sent = document.createElement("div");
+    sent.className = "clozeSentence hanzi";
+    var blankTxt = answeredState ? ex.correct.zh : "    ";
+    sent.innerHTML = ex.before + '<span class="blank' + (answeredState?" filled":"") + '">' + blankTxt + '</span>' + ex.after;
+    card.appendChild(sent);
+
+    var hintOpen = !!clozeHintOpen[ex.id];
+    var hintRow = document.createElement("div");
+    hintRow.className = "hintRow";
+    var hintBtn = document.createElement("button");
+    hintBtn.type = "button";
+    hintBtn.className = "ghost";
+    hintBtn.textContent = hintOpen ? "Esconder traducao" : "Ver traducao";
+    hintBtn.addEventListener("click", function(){
+      clozeHintOpen[ex.id] = !clozeHintOpen[ex.id];
+      renderCloze();
+    });
+    hintRow.appendChild(hintBtn);
+    if(hintOpen){
+      var pt = document.createElement("div");
+      pt.className = "clozePt";
+      pt.textContent = ex.pt;
+      hintRow.appendChild(pt);
+    }
+    card.appendChild(hintRow);
+
+    var opts = document.createElement("div");
+    opts.className = "options";
+    options.forEach(function(o){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "opt";
+      b.innerHTML = '<span class="zh hanzi">'+o.zh+'</span><span class="py">'+o.py+'</span><span class="pt">'+o.pt+'</span>';
+      if(answeredState){
+        b.disabled = true;
+        if(o.zh===ex.correct.zh) b.classList.add("correct");
+        else if(clozeAnswered.lastPicked === o.zh && answeredState==="wrong") b.classList.add("wrong");
+      }
+      b.addEventListener("click", function(){ answerCloze(ex, o); });
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);
+
+    var reveal = document.createElement("div");
+    reveal.className = "clozeReveal";
+    if(answeredState){
+      var msg = answeredState==="right" ? "Certo!" : "Quase — a resposta certa e " + ex.correct.zh + ".";
+      reveal.innerHTML = '<span class="msg ' + answeredState + '">' + msg + '</span><br><span class="py">' + ex.full + '</span>';
+    }
+    card.appendChild(reveal);
+
+    var nav = document.createElement("div");
+    nav.className = "clozeNav";
+    var prev = document.createElement("button");
+    prev.className = "ghost"; prev.type = "button"; prev.textContent = "Anterior";
+    prev.disabled = clozeIndex===0;
+    prev.addEventListener("click", function(){ if(clozeIndex>0){ clozeIndex--; renderCloze(); } });
+    var isLast = clozeIndex === CTOTAL-1;
+    var next = document.createElement("button");
+    next.className = "solid"; next.type = "button";
+    next.textContent = isLast ? "Ver pontuacao final" : "Proxima";
+    next.disabled = !answeredState;
+    next.addEventListener("click", function(){
+      if(isLast){ clozeView = "summary"; renderCloze(); }
+      else if(clozeIndex < CTOTAL-1){ clozeIndex++; renderCloze(); }
+    });
+    nav.appendChild(prev); nav.appendChild(next);
+    card.appendChild(nav);
+  }
+
+  function answerCloze(ex, picked){
+    if(clozeAnswered[ex.id]) return;
+    var isRight = picked.zh === ex.correct.zh;
+    clozeAnswered[ex.id] = isRight ? "right" : "wrong";
+    clozeAnswered.lastPicked = picked.zh;
+    if(isRight && state.clozeCorrectIds.indexOf(ex.id)===-1){
+      state.clozeCorrectIds.push(ex.id);
+    }
+    markStudiedToday();
+    saveState();
+    renderStats();
+    renderCloze();
+  }
+
+  /* ---------- Boot ---------- */
   loadState();
   renderStats();
   renderList();
-
 })();
 </script>
 </body>
